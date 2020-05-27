@@ -161,5 +161,52 @@ app.get('api/exercise/log/:userId/:from/:to/:limit', async(req, res)=>{
     }).limit(req.params.limit);
     res.json(ex);
 })
+app.get('/api/exercise/log', async(req, res)=>{
+    console.log(req.query);
+    var userId = req.query.userId;
+    var from = req.query.from;
+    var to = req.query.to;
+    var limit = parseInt( req.query.limit);
+    console.log("limit ", limit, from)
+    var ex;
+    if(from !== undefined ){
+        if(to !== undefined){
+            if(!isNaN(limit) ){
+                ex = await Excercise.find({
+                $and : [
+                    { userId : userId},
+                        {date: {
+                            $gte: new Date(from),
+                            $lt: new Date(to)
+                        }}
+                    ]
+                }).limit(limit);
+            }
+            else {
+                ex = await Excercise.find({
+                $and : [
+                    { userId : userId},
+                        {date: {
+                            $gte: new Date(from),
+                            $lt: new Date(to)
+                        }}
+                    ]
+                })
+            }
 
+        } else {
+            ex = await Excercise.find({
+                $and : [
+                    { userId : userId},
+                    {date: { $gte: new Date(from)}}
+                    ]
+                })
+        }
+     
+    } else {
+        ex = await Excercise.find({userId: userId})
+    }
+    
+    res.json(ex);
+  })
 app.listen(PORT, () => console.log(`Server is running on ${PORT}`));
