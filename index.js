@@ -7,6 +7,7 @@ const URL = require('url');
 const dns = require('dns');
 const User = require('./model/user');
 const Excercise = require('./model/exercises');
+var multer = require('multer');
 
 var PORT = 3000
 
@@ -208,5 +209,24 @@ app.get('/api/exercise/log', async(req, res)=>{
     }
     
     res.json(ex);
+  })
+
+
+
+  // Ex 5
+  app.get('/hello', function(req, res){
+    res.json({greetings: "Hello, API"});
+  });
+  
+  var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './')
+    },
+    filename: function (req, file, cb) {
+      // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+      // cb(null, file.fieldname + '-' + uniqueSuffix)
+      cb(null, file.originalname);
+    }
+
   })
 app.listen(PORT, () => console.log(`Server is running on ${PORT}`));
