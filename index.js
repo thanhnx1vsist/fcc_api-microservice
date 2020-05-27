@@ -88,7 +88,41 @@ app.get('/api/whoami', (req, res) => {
         software: software
     })
 })
+// Ex 3
+app.post('/api/shorturl/new', async (req, res) => {
+    var newURL = await req.body.url;
+    var count = await Url.find().count();
+    const isValid = await isValidURL(newURL);
+    console.log('iiiii', isValid);
+    var newUrl = new Url({
+        original_url: req.body.url,
+        short_url : count
+    })
 
+    var saveUrl = await newUrl.save();
+    res.json(newUrl);
+})
+
+app.get('/api/shorturl/:num', async (req, res) => {
+    console.log('rrrr', req.params.num);
+    const url = await Url.findOne({ short_url: req.params.num });
+    console.log("hello", url);
+    if (url) {
+        console.log(url.original_url);
+        res.redirect(url.original_url);
+    }
+    else res.json('Number is bigger than length of database');
+})
+
+function isValidURL(url){
+    const {hostname} = URL.parse(url);
+    return new Promise((resolve, reject)=>{
+        dns.lookup(hostname, (error, addresses, family)=>{
+            if(error) resolve(false);
+            return resolve(true)
+        })
+    })
+}
 
 app.get("/", (req,res)=>{
     res.render("index.html")
